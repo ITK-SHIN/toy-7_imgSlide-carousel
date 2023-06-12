@@ -5,5 +5,99 @@
     return document.querySelector(target)
   }
 
-  document.addEventListener('DOMContentLoaded', () => {})
+  class Carousel {
+    constructor(carouselElement) {
+      this.carouselElement = carouselElement
+      this.itemClassName = 'carousel_item'
+      this.items = this.carouselElement.querySelectorAll('.carousel_item')
+
+      this.totalItems = this.items.length //5
+      this.current = 0
+      this.isMoving = false
+    }
+
+    //캐러셀 초기화 메서드
+    initCarousel() {
+      this.isMoving = false
+      this.items[0].classList.add('active')
+      this.items[1].classList.add('next')
+      this.items[this.totalItems - 1].classList.add('prev')
+    }
+
+    disabledInteraction() {
+      this.isMoving = true
+      setTimeout(() => {
+        this.isMoving = false
+      }, 500)
+    }
+
+    setEventListener() {
+      this.prevButton = this.carouselElement.querySelector(
+        '.carousel_button--prev'
+      )
+      this.nextButton = this.carouselElement.querySelector(
+        '.carousel_button--next'
+      )
+
+      this.prevButton.addEventListener('click', () => {
+        this.movePrev()
+      })
+      this.nextButton.addEventListener('click', () => {
+        this.moveNext()
+      })
+    }
+
+    moveCarouselTo() {
+      if (this.isMoving) return //isMoving이 true인 경우 그냥 return 시켜준다.
+      this.disabledInteraction()
+      let prev = this.current - 1
+      let next = this.current + 1
+
+      if (this.current === 0) {
+        prev = this.totalItems - 1
+      } else if (this.current === this.totalItems - 1) {
+        next = 0
+      }
+
+      for (let i = 0; i < this.totalItems; i++) {
+        if (i === this.current) {
+          this.items[i].className = this.itemClassName + ' active'
+        } else if (i === prev) {
+          this.items[i].className = this.itemClassName + ' prev'
+        } else if (i === next) {
+          this.items[i].className = this.itemClassName + ' next'
+        } else {
+          this.items[i].className = this.itemClassName
+        }
+      }
+    }
+
+    moveNext() {
+      if (this.isMoving) return //isMoving이 true인 경우 그냥 return 시켜준다.
+      if (this.current === this.totalItems - 1) {
+        this.current = 0
+      } else {
+        this.current++
+      }
+      this.moveCarouselTo()
+    }
+
+    movePrev() {
+      if (this.isMoving) return //isMoving이 true인 경우 그냥 return 시켜준다.
+      if (this.current === 0) {
+        this.current = this.totalItems - 1
+      } else {
+        this.current--
+      }
+      this.moveCarouselTo()
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const carouselElement = get('.carousel')
+    const carousel = new Carousel(carouselElement)
+
+    carousel.initCarousel()
+    carousel.setEventListener()
+  })
 })()
